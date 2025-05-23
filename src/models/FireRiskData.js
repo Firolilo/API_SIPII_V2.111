@@ -4,7 +4,6 @@ const WeatherSchema = require('./Weather');
 const EnvironmentalFactorsSchema = require('./EnvironmentalFactors');
 
 const FireRiskDataSchema = new mongoose.Schema({
-<<<<<<< HEAD
 
     timestamp: { type: String, required: true },
     location: { type: String, required: true },
@@ -12,11 +11,6 @@ const FireRiskDataSchema = new mongoose.Schema({
     volunteers: { type: Number, required: true }, // 👈 Nuevo campo
     volunteerName: { type: String, required: true, default: "" }, // 👈 Nuevo campo
 
-=======
-    timestamp: { type: String, required: true },
-    location: { type: String, required: true },
-    duration: { type: Number, required: true },
->>>>>>> 9d54ed24c9230d4c0829c50f328b985985c049c3
     name: { type: String, default: '' },
     coordinates: { type: CoordinatesSchema, required: true },
     weather: { type: WeatherSchema, required: true },

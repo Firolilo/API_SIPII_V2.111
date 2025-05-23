@@ -68,11 +68,8 @@ const typeDefs = gql`
     timestamp: String!
     location: String!
     duration: Int!  
-<<<<<<< HEAD
     volunteers: Int!
     volunteerName: String!
-=======
->>>>>>> 9d54ed24c9230d4c0829c50f328b985985c049c3
     name: String
     coordinates: Coordinates!
     weather: Weather!
@@ -87,11 +84,8 @@ const typeDefs = gql`
     timestamp: String!
     location: String!
     duration: Int!
-<<<<<<< HEAD
     volunteers: Int!
     volunteerName: String!
-=======
->>>>>>> 9d54ed24c9230d4c0829c50f328b985985c049c3
     name: String     
     coordinates: CoordinatesInput!
     weather: WeatherInput!

@@ -67,13 +67,9 @@ const resolvers = {
 
                 const newSimulation = new FireRiskData({
                     ...input,
-<<<<<<< HEAD
                     volunteers: input.volunteers,
                     duration: input.duration,
                     volunteerName: input.volunteerName,
-=======
-                    duration: input.duration,
->>>>>>> 9d54ed24c9230d4c0829c50f328b985985c049c3
                     environmentalFactors: {
                         droughtIndex: 5,
                         vegetationType: "Forest",

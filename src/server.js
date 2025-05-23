@@ -26,50 +26,6 @@ mongoose.connect('mongodb://127.0.0.1:27017/fireRiskDB', {
 
 async function insertInitialData() {
     try {
-<<<<<<< HEAD
-
-=======
-        const count = await FireRiskData.countDocuments();
-
-        // Solo insertamos un documento si la colección está vacía
-        if (count === 0) {
-            const exampleData = new FireRiskData({
-                timestamp: "2025-04-25T00:00:00Z",
-                location: "San José de Chiquitos",
-                coordinates: { lat: -17.8, lng: -61.5 },
-                weather: {
-                    temperature: 30,
-                    humidity: 65,
-                    windSpeed: 5,
-                    windDirection: 90,
-                    precipitation: 0,
-                    season: "Dry"
-                },
-                environmentalFactors: {
-                    droughtIndex: 5,
-                    vegetationType: "Forest",
-                    vegetationDryness: 80,
-                    humanActivityIndex: 3,
-                    regionalFactor: 1
-                },
-                parameters: {
-                    temperature: 30,
-                    humidity: 65,
-                    windSpeed: 5,
-                    windDirection: 90,
-                    simulationSpeed: 1
-                },
-                initialFires: [
-                    { lat: -17.82, lng: -61.52, intensity: 1 }
-                ],
-                fireRisk: 80,
-                fireDetected: true
-            });
-
-            await exampleData.save();
-            console.log('📄 Documento de ejemplo insertado en la base de datos.');
-        }
->>>>>>> 9d54ed24c9230d4c0829c50f328b985985c049c3
     } catch (error) {
         console.error('❌ Error al insertar los datos iniciales: ', error);
     }
