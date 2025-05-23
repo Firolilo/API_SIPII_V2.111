@@ -6,8 +6,8 @@ COPY package*.json ./
 
 RUN npm install --production
 
-COPY . .
+COPY .env ./
 
-EXPOSE 3000
+EXPOSE 4000
 
 CMD ["node", "index.js"]
