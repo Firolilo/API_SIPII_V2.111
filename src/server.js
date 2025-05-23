@@ -17,7 +17,7 @@ try {
 }
 
 // Conexión a MongoDB con mejores opciones
-mongoose.connect('mongodb://127.0.0.1:27017/fireRiskDB', {
+mongoose.connect('mongodb://jhair:alas15987@34.28.246.100:27017/fireRiskDB', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
