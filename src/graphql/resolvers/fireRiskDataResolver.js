@@ -1,107 +1,130 @@
-// src/graphql/resolvers/fireRiskDataResolver.js
-const { generateFireRiskData } = require('../../utils/randomDataGenerator');
+const FireRiskData = require('../../models/FireRiskData');
+const User = require('../../models/User');
 
 const resolvers = {
+    // QUERIES
     Query: {
-        getAllFireRiskData: (_, { count }) => {
-            return generateFireRiskData(count);
+        // FireRiskData queries
+        getAllFireRiskData: async (_, { count }) => {
+            return await FireRiskData.find().sort({ timestamp: -1 }).limit(count);
+        },
+        getFireRiskDataByLocation: async (_, { location, count }) => {
+            return await FireRiskData.find({ location })
+                .sort({ timestamp: -1 })
+                .limit(count);
+        },
+        getHighRiskFireData: async (_, { threshold = 75, count = 5 }) => {
+            return await FireRiskData.find({ fireRisk: { $gte: threshold } })
+                .sort({ timestamp: -1 })
+                .limit(count);
+        },
+        getChiquitosFireRiskData: async (_, { count = 10 }) => {
+            return await FireRiskData.find({ location: 'Chiquitos' })
+                .sort({ timestamp: -1 })
+                .limit(count);
         },
 
-        getFireRiskDataByLocation: (_, { location, count }) => {
-            return generateFireRiskData(count, { location });
-        },
-
-        getHighRiskFireData: (_, { threshold, count }) => {
-            // Generamos más datos para asegurar obtener los de alto riesgo
-            const allData = generateFireRiskData(count * 3);
-            return allData
-                .filter(item => item.fireRisk >= threshold)
-                .slice(0, count)
-                .sort((a, b) => b.fireRisk - a.fireRisk);
-        },
-
-        getChiquitosFireRiskData: async (_, { count }, { FireRiskData }) => {
-            try {
-                console.log('Buscando datos en MongoDB...');
-                const data = await FireRiskData.find()
-                    .sort({ timestamp: -1 })
-                    .limit(count || 10)
-                    .lean();
-
-                console.log(`Encontrados ${data.length} registros`);
-                return data.map(item => ({
-                    ...item,
-                    id: item._id.toString()
-                }));
-            } catch (error) {
-                console.error('Error al obtener datos de MongoDB:', error);
-                // Fallback a datos aleatorios si hay error
-                console.log('Generando datos aleatorios como fallback');
-                return generateFireRiskData(count, { location: 'San José de Chiquitos' });
-            }
-        }
+        // User queries
+        users: async () => await User.find().sort({ createdAt: -1 }),
+        user: async (_, { id }) => await User.findById(id),
     },
 
+    // MUTATIONS
     Mutation: {
-        deleteFireRiskData: async (_, { id }, { FireRiskData }) => {
-            const removed = await FireRiskData.findByIdAndDelete(id);
-            return !!removed;          // true si se eliminó
+        // FireRiskData mutations
+        saveSimulation: async (_, { input }) => {
+            try {
+                if (!input.initialFires?.length) {
+                    throw new Error("Se requieren puntos iniciales de incendio");
+                }
+
+                const newSimulation = new FireRiskData({
+                    ...input,
+                    environmentalFactors: {
+                        droughtIndex: 5,
+                        vegetationType: "Forest",
+                        vegetationDryness: 80,
+                        humanActivityIndex: 3,
+                        regionalFactor: 1,
+                        ...input.environmentalFactors
+                    }
+                });
+
+                return await newSimulation.save();
+            } catch (error) {
+                console.error('Error al guardar simulación:', error);
+                throw new Error(`Error al guardar: ${error.message}`);
+            }
         },
-        updateFireRiskName: async (_, { id, name }, { FireRiskData }) => {
+
+        deleteFireRiskData: async (_, { id }) => {
+            const removed = await FireRiskData.findByIdAndDelete(id);
+            return !!removed;
+        },
+
+        updateFireRiskName: async (_, { id, name }) => {
             const doc = await FireRiskData.findByIdAndUpdate(
                 id,
                 { name },
                 { new: true }
             );
             if (!doc) throw new Error('Registro no encontrado');
-            return { id: doc._id.toString(), ...doc.toObject() };
+            return doc;
         },
 
-        saveSimulation: async (_, { input }, { FireRiskData }) => {
-            try {
-                console.log('Guardando simulación:', JSON.stringify(input, null, 2));
+        // User mutations
+        createUser: async (_, { input }) => {
+            const user = new User({
+                ...input,
+                isAdmin: input.isAdmin || false
+            });
+            return await user.save();
+        },
 
-                if (!input.initialFires || input.initialFires.length === 0) {
-                    throw new Error("Se requieren puntos iniciales de incendio");
-                }
+        updateUser: async (_, { id, input }) => {
+            return await User.findByIdAndUpdate(id, input, { new: true });
+        },
 
-                const newSimulation = new FireRiskData({
-                    ...input,
-                    volunteers: input.volunteers,
-                    duration: input.duration,
-                    volunteerName: input.volunteerName,
-                    environmentalFactors: {
-                        droughtIndex: 5,
-                        vegetationType: "Forest",
-                        vegetationDryness: 80,
-                        humanActivityIndex: 3,
-                        regionalFactor: 1
-                    }
-                });
+        deleteUser: async (_, { id }) => {
+            return await User.findByIdAndDelete(id);
+        },
 
-                const saved = await newSimulation.save();
-                console.log('Simulación guardada con ID:', saved._id);
+        makeAdmin: async (_, { id }) => {
+            return User.findByIdAndUpdate(
+                id,
+                {isAdmin: true},
+                {new: true}
+            );
+        },
 
-                return {
-                    id: saved._id.toString(),
-                    timestamp: saved.timestamp,
-                    location: saved.location,
-                    duration: saved.duration,
-                    name: saved.name,
-                    coordinates: saved.coordinates,
-                    weather: saved.weather,
-                    fireRisk: saved.fireRisk,
-                    fireDetected: saved.fireDetected,
-                    parameters: saved.parameters,
-                    initialFires: saved.initialFires,
-                    environmentalFactors: saved.environmentalFactors
-                };
-            } catch (error) {
-                console.error('Error al guardar la simulación:', error);
-                throw new Error(`Error al guardar: ${error.message}`);
-            }
-        }
-    },
+        login: async (_, { ci, password }) => {
+            const user = await User.findOne({ ci });
+            if (!user) throw new Error('Usuario no encontrado');
+            if (password !== user.password) throw new Error('Contraseña incorrecta');
+            return { user };
+        },
+
+        register: async (_, { input }) => {
+            const existingUser = await User.findOne({ ci: input.ci });
+            if (existingUser) throw new Error('CI ya registrada');
+
+            // Aquí puedes agregar hashing si quieres (recomendado)
+            if (input.nombre === "admin") input.isAdmin = true;
+            else input.isAdmin = false;
+
+            const user = new User(input);
+            await user.save();
+            return user;
+        },
+
+        crearUsuarioGlobal: async (_, { input }) => {
+            const user = new User({
+                ...input,
+                isAdmin: true
+            });
+            return await user.save();
+        },
+    }
 };
 
 module.exports = resolvers;

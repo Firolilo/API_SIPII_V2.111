@@ -95,17 +95,61 @@ const typeDefs = gql`
     initialFires: [InitialFireInput!]!
   }
 
+  type User {
+    id: ID!
+    nombre: String!
+    apellido: String!
+    email: String!
+    ci: String!
+    telefono: String
+    password: String!
+    isAdmin: Boolean!
+    createdAt: String!
+  }
+
+  input UserInput {
+    nombre: String!
+    apellido: String!
+    email: String
+    ci: String!
+    password: String!   
+    telefono: String
+    isAdmin: Boolean
+  }
+
+  type AuthPayload {
+      token: String
+      user: User
+  }
+
+  type RegisterPayload {
+      user: User
+  }
+  
   type Query {
     getAllFireRiskData(count: Int = 10): [FireRiskData!]!
     getFireRiskDataByLocation(location: String!, count: Int = 5): [FireRiskData!]!
     getHighRiskFireData(threshold: Float = 75, count: Int = 5): [FireRiskData!]!
     getChiquitosFireRiskData(count: Int = 10): [FireRiskData!]!
+
+    users: [User]
+    user(id: ID!): User
   }
 
   type Mutation {
     saveSimulation(input: SimulationInput!): FireRiskData
     deleteFireRiskData(id: ID!): Boolean! 
     updateFireRiskName(id: ID!, name: String!): FireRiskData
+
+    createUser(input: UserInput!): User
+      
+    updateUser(id: ID!, input: UserInput!): User
+    deleteUser(id: ID!): User
+    makeAdmin(id: ID!): User
+      
+    login(ci: String!, password: String!): AuthPayload
+      register(input: UserInput!): User!
+    crearUsuarioGlobal(input: UserInput!): User
   }
 `;
 
