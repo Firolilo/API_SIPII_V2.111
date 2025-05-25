@@ -17,7 +17,7 @@ try {
 }
 
 // Conexión a MongoDB con mejores opciones
-mongoose.connect('mongodb://jhair:alas15987@34.28.246.100:27017/alas_chiquitanas?authSource=admin', {
+mongoose.connect('mongodb://sipi:sipi123@mongo:27017/alas_chiquitanas?authSource=admin', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     serverSelectionTimeoutMS: 5000,
