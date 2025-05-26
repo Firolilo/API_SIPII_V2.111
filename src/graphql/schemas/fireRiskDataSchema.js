@@ -96,25 +96,26 @@ const typeDefs = gql`
   }
 
   type User {
-    id: ID!
-    nombre: String!
-    apellido: String!
-    email: String!
-    ci: String!
-    telefono: String
-    password: String!
-    isAdmin: Boolean!
-    createdAt: String!
+      id: ID!
+      nombre: String!
+      apellido: String!
+      email: String!
+      ci: String!
+      telefono: String
+      password: String!
+      isAdmin: Boolean!
+      state: String!
+      createdAt: String!
   }
 
   input UserInput {
-    nombre: String!
-    apellido: String!
-    email: String
-    ci: String!
-    password: String!   
-    telefono: String
-    isAdmin: Boolean
+      nombre: String!
+      apellido: String!
+      email: String
+      ci: String!
+      password: String   
+      telefono: String
+      isAdmin: Boolean
   }
 
   type AuthPayload {
@@ -125,6 +126,12 @@ const typeDefs = gql`
   type RegisterPayload {
       user: User
   }
+
+  type ChangePasswordResponse {
+    success: Boolean!
+    message: String!
+    user: User
+}
   
   type Query {
     getAllFireRiskData(count: Int = 10): [FireRiskData!]!
@@ -148,8 +155,10 @@ const typeDefs = gql`
     makeAdmin(id: ID!): User
       
     login(ci: String!, password: String!): AuthPayload
-      register(input: UserInput!): User!
+    register(input: UserInput!): User!
     crearUsuarioGlobal(input: UserInput!): User
+
+    changePassword(currentPassword: String!, newPassword: String!): ChangePasswordResponse!
   }
 `;
 

@@ -32,6 +32,11 @@ const UserSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    state: {
+        type: String,
+        enum: ['Activo', 'Inactivo', 'Pendiente'],
+        default: 'Pendiente'
+    },
     createdAt: {
         type: Date,
         default: Date.now

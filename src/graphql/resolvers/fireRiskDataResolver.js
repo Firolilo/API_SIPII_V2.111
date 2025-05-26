@@ -1,5 +1,6 @@
 const FireRiskData = require('../../models/FireRiskData');
 const User = require('../../models/User');
+import axios from "axios";
 
 const resolvers = {
     // QUERIES
@@ -76,7 +77,8 @@ const resolvers = {
         createUser: async (_, { input }) => {
             const user = new User({
                 ...input,
-                isAdmin: input.isAdmin || false
+                isAdmin: input.isAdmin || false,
+                state: input.state || 'Pendiente'
             });
             return await user.save();
         },
@@ -108,22 +110,86 @@ const resolvers = {
             const existingUser = await User.findOne({ ci: input.ci });
             if (existingUser) throw new Error('CI ya registrada');
 
-            // Aquí puedes agregar hashing si quieres (recomendado)
-            if (input.nombre === "admin") input.isAdmin = true;
-            else input.isAdmin = false;
+            if (!input.password) {
+                throw new Error('La contraseña es requerida');
+            }
 
-            const user = new User(input);
+            const isAdmin = input.nombre.toLowerCase() === "admin";
+            const user = new User({
+                ...input,
+                isAdmin,
+                state: 'Activo'
+            });
+
             await user.save();
+
+            try {
+                await axios.post('http://Global-Api:2020/global_registro/alasB', {
+                    nombre: user.nombre,
+                    apellido: user.apellido,
+                    email: user.email,
+                    ci: user.ci,
+                    telefono: user.telefono,
+                });
+                
+                console.log('✅ Usuario registrado en sistema global');
+            } catch (error) {
+                console.error('❌ Error registrando ADMIN en sistema global:', error.message);
+            }
+
             return user;
         },
 
         crearUsuarioGlobal: async (_, { input }) => {
+            if (input.password) {
+                throw new Error('No se puede enviar contraseña para usuario global');
+            }
+            
             const user = new User({
                 ...input,
-                isAdmin: true
+                isAdmin: true,
+                state: 'Inactivo',
+                password: 'temp_password'
             });
+            
             return await user.save();
         },
+
+        changePassword: async (_, { currentPassword, newPassword }, { user, User }) => {
+            try {
+                if (!user) {
+                    throw new Error('Debe iniciar sesión para cambiar la contraseña');
+                }
+
+                const existingUser = await User.findById(user.id);
+                if (!existingUser) {
+                    throw new Error('Usuario no encontrado');
+                }
+                
+                if (newPassword.length < 6) {
+                    throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
+                }
+
+                existingUser.password = newPassword;
+                existingUser.state = 'Activo'; 
+                
+                await existingUser.save();
+
+                return {
+                    success: true,
+                    message: 'Contraseña cambiada exitosamente',
+                    user: existingUser
+                };
+
+            } catch (error) {
+                console.error('Error en changePassword:', error);
+                return {
+                    success: false,
+                    message: error.message,
+                    user: null
+                };
+            }
+        }
     }
 };
 
