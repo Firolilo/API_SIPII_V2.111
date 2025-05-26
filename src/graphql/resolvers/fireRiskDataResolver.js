@@ -1,6 +1,6 @@
-const FireRiskData = require('../../models/FireRiskData');
-const User = require('../../models/User');
-import axios from "axios";
+import FireRiskData from '../../models/FireRiskData.js';
+import User from '../../models/User.js';
+import axios from 'axios';
 
 const resolvers = {
     // QUERIES
@@ -155,24 +155,20 @@ const resolvers = {
             return await user.save();
         },
 
-        changePassword: async (_, { currentPassword, newPassword }, { user, User }) => {
+        changePassword: async (_, { ci, currentPassword, newPassword }, { User }) => {
             try {
-                if (!user) {
-                    throw new Error('Debe iniciar sesión para cambiar la contraseña');
-                }
-
-                const existingUser = await User.findById(user.id);
+                const existingUser = await User.findOne({ ci });
                 if (!existingUser) {
                     throw new Error('Usuario no encontrado');
                 }
-                
+
                 if (newPassword.length < 6) {
                     throw new Error('La nueva contraseña debe tener al menos 6 caracteres');
                 }
 
                 existingUser.password = newPassword;
-                existingUser.state = 'Activo'; 
-                
+                existingUser.state = 'Activo';
+
                 await existingUser.save();
 
                 return {
@@ -190,7 +186,8 @@ const resolvers = {
                 };
             }
         }
+
     }
 };
 
-module.exports = resolvers;
+export default resolvers;

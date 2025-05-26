@@ -4,7 +4,8 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const typeDefs = require('./graphql/schemas/fireRiskDataSchema');
-const resolvers = require('./graphql/resolvers/fireRiskDataResolver');
+const resolversModule = require('./graphql/resolvers/fireRiskDataResolver');
+const resolvers = resolversModule.default || resolversModule;
 const User = require('./models/User');
 const FireRiskData = require('./models/FireRiskData');
 

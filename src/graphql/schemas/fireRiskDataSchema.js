@@ -109,13 +109,14 @@ const typeDefs = gql`
   }
 
   input UserInput {
-      nombre: String!
-      apellido: String!
+      nombre: String
+      apellido: String
       email: String
-      ci: String!
+      ci: String
       password: String   
       telefono: String
       isAdmin: Boolean
+      state: String 
   }
 
   type AuthPayload {
@@ -158,7 +159,7 @@ const typeDefs = gql`
     register(input: UserInput!): User!
     crearUsuarioGlobal(input: UserInput!): User
 
-    changePassword(currentPassword: String!, newPassword: String!): ChangePasswordResponse!
+    changePassword(ci: String!, currentPassword: String!, newPassword: String!): ChangePasswordResponse!
   }
 `;
 
