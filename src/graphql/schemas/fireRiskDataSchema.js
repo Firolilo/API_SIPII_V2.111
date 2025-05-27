@@ -119,6 +119,14 @@ const typeDefs = gql`
       state: String 
   }
 
+  input inputUsuarioGlobal {
+      nombre: String
+      apellido: String
+      email: String
+      ci: String
+      telefono: String
+  }
+
   type AuthPayload {
       token: String
       user: User
@@ -157,7 +165,7 @@ const typeDefs = gql`
       
     login(ci: String!, password: String!): AuthPayload
     register(input: UserInput!): User!
-    crearUsuarioGlobal(input: UserInput!): User
+    nuevoUsuarioGlobal(input: inputUsuarioGlobal!): User
 
     changePassword(ci: String!, currentPassword: String!, newPassword: String!): ChangePasswordResponse!
   }

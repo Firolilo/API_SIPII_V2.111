@@ -20,7 +20,7 @@ const resolvers = {
                 .limit(count);
         },
         getChiquitosFireRiskData: async (_, { count = 10 }) => {
-            return await FireRiskData.find({ location: 'Chiquitos' })
+            return await FireRiskData.find({ location: 'San José de Chiquitos' })
                 .sort({ timestamp: -1 })
                 .limit(count);
         },
@@ -140,18 +140,17 @@ const resolvers = {
             return user;
         },
 
-        crearUsuarioGlobal: async (_, { input }) => {
-            if (input.password) {
-                throw new Error('No se puede enviar contraseña para usuario global');
-            }
+        nuevoUsuarioGlobal: async (_, { input }) => {
             
             const user = new User({
                 ...input,
-                isAdmin: true,
+                isAdmin: false,
                 state: 'Inactivo',
                 password: 'temp_password'
             });
             
+            console.log(user)
+
             return await user.save();
         },
 
