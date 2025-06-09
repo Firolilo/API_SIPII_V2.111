@@ -37,6 +37,11 @@ const UserSchema = new mongoose.Schema({
         enum: ['Activo', 'Inactivo', 'Pendiente'],
         default: 'Pendiente'
     },
+    entidad_perteneciente: {
+        type: String,
+        enum: ['Policia', 'Servicios Medicos', 'Defensa Civil', 'Bombero', 'Veterinario'],
+        required: false
+    },
     createdAt: {
         type: Date,
         default: Date.now

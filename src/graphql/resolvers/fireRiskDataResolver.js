@@ -9,6 +9,9 @@ const resolvers = {
         getAllFireRiskData: async (_, { count }) => {
             return await FireRiskData.find().sort({ timestamp: -1 }).limit(count);
         },
+        getAllFireRiskDataAll: async (_) => {
+            return await FireRiskData.find().sort({ timestamp: -1 });
+        },
         getFireRiskDataByLocation: async (_, { location, count }) => {
             return await FireRiskData.find({ location })
                 .sort({ timestamp: -1 })
@@ -75,11 +78,17 @@ const resolvers = {
 
         // User mutations
         createUser: async (_, { input }) => {
+            const entidades = ['Policía', 'Servicios Medicos', 'Defensa Civil', 'Bomberos', 'Veterinarios'];
+
+            const entidadAleatoria = entidades[Math.floor(Math.random() * entidades.length)];
+            
             const user = new User({
                 ...input,
                 isAdmin: input.isAdmin || false,
-                state: input.state || 'Pendiente'
+                state: input.state || 'Pendiente',
+                entidadPertenciente: entidadAleatoria 
             });
+            
             return await user.save();
         },
 

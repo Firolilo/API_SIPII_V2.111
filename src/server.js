@@ -8,6 +8,7 @@ const resolversModule = require('./graphql/resolvers/fireRiskDataResolver');
 const resolvers = resolversModule.default || resolversModule;
 const User = require('./models/User');
 const FireRiskData = require('./models/FireRiskData');
+const iniciarServicioVerificacion = require('./services/FireService.js');
 
 
 // Conexión a MongoDB
@@ -18,6 +19,8 @@ mongoose.connect(process.env.MONGODB_URI, {
 .then(async () => {
     console.log('✅ Conectado a MongoDB');
     
+    iniciarServicioVerificacion();
+
     // Crear usuario ADMIN si no existe
     const adminExists = await User.findOne({ ci: '0000000' });
     if (!adminExists) {

@@ -106,6 +106,7 @@ const typeDefs = gql`
       isAdmin: Boolean!
       state: String!
       createdAt: String!
+      entidad_perteneciente: String
   }
 
   input UserInput {
@@ -144,9 +145,11 @@ const typeDefs = gql`
   
   type Query {
     getAllFireRiskData(count: Int = 10): [FireRiskData!]!
+    getAllFireRiskDataAll: [FireRiskData!]!
     getFireRiskDataByLocation(location: String!, count: Int = 5): [FireRiskData!]!
     getHighRiskFireData(threshold: Float = 75, count: Int = 5): [FireRiskData!]!
     getChiquitosFireRiskData(count: Int = 10): [FireRiskData!]!
+    
 
     users: [User]
     user(id: ID!): User
